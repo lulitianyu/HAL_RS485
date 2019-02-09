@@ -52,6 +52,9 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "ringbuffer.h"
+#include "trans_recieve_buff_control.h"
+#include "modbus_master.h"
 
 /* USER CODE END Includes */
 

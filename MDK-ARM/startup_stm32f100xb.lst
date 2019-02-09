@@ -501,9 +501,10 @@ ARM Macro Assembler    Page 8
 Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M3 --apcs=interw
 ork --depend=rs485\startup_stm32f100xb.d -ors485\startup_stm32f100xb.o -I.\RTE\
 _RS485 -IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.4.0\CMSIS\Core\Include -IC:\Keil_v5\AR
-M\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include --predefine="__MICROLIB SETA 1" 
---predefine="__UVISION_VERSION SETA 524" --predefine="_RTE_ SETA 1" --predefine
-="STM32F10X_MD_VL SETA 1" --list=startup_stm32f100xb.lst startup_stm32f100xb.s
+M\PACK\Keil\STM32F1xx_DFP\2.3.0\Device\Include --predefine="__EVAL SETA 1" --pr
+edefine="__MICROLIB SETA 1" --predefine="__UVISION_VERSION SETA 524" --predefin
+e="_RTE_ SETA 1" --predefine="STM32F10X_MD_VL SETA 1" --list=startup_stm32f100x
+b.lst startup_stm32f100xb.s
 
 
 
@@ -1192,4 +1193,4 @@ Symbol: __main
       At line 165 in file startup_stm32f100xb.s
 Comment: __main used once
 2 symbols
-404 symbols in table
+405 symbols in table

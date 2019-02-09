@@ -40,7 +40,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-
+//#include "ringbuffer.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -65,6 +65,9 @@
 UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart2;
 uint8_t byte;
+RingBuffer  mbRxRingBuf;
+uint8_t     mbRxBuf[200];
+uint16_t MBResponseTimeout = 300;
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -79,6 +82,7 @@ void RS485_postTransmission(void);
 static inline uint8_t lowByte(uint16_t);
 static inline uint8_t highByte(uint16_t);
 uint16_t CRC16(uint8_t *, uint16_t);
+void debbugXui(char*);//uint8_t*);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -112,31 +116,79 @@ uint16_t CRC16(uint8_t *pucData, uint16_t usLen) {
 }
 
 void ModBusRead(uint16_t adr, uint16_t len) {
-	// ??????? ?????? 		1-????? ??????????, 	1-???????, 	2-????? ????????, 		2-?????????? ????????? ??????,	2-CRC
 	//uint8_t buf[8]    = {	0x01, 					0x03, 		adr / 256, adr % 256, 	len / 256, len % 256,			0x00, 0x00};
 	
-	uint8_t buf[8]    = {	0x01, 					0x04, 		highByte(adr), lowByte(adr), 	highByte(len), lowByte(len),			0x00, 0x00};
+	//uint8_t bufRESET[8] = {0x1, 0x06, highByte(0x2199), lowByte(0x2199), highByte(0x8D), lowByte(0x8D), 0x00, 0x00};
+	//uint16_t rez2	= CRC16(bufRESET, 6);
+	//bufRESET[6] = rez2 % 256;
+	//bufRESET[7] = rez2 / 256; 
+	//HAL_UART_Transmit(&huart2, bufRESET, 8, 0x100);
+	//uint8_t rez2 = ("%d") len;
+	
+	uint8_t buf[8]    = {0x01, 0x03, highByte(adr), lowByte(adr), highByte(len), lowByte(len),	0x00, 0x00};
 	uint8_t buf2[25]; 
 	uint16_t rez	= CRC16(buf, 6);
 	buf[6] = rez % 256;
 	buf[7] = rez / 256;
-  char str[2];
+  uint8_t xresult;
+	uint8_t xRespBtCnt = len*2 + 5;
+	uint8_t mbADUSize = 0;
 	RS485_preTransmission();
+	
 	if (HAL_UART_Transmit(&huart2, buf, 8, 0x100) != HAL_OK) return;
 	
-	RS485_postTransmission();	
-	//memset(buf, 0x00, 8);
-	if(HAL_UART_Receive(&huart2, buf2, 7, 0x100)== HAL_OK){
-		sprintf(str,"%x",buf2[2]);
-		sprintf(str+2,"%x",buf2[3]);
-		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_9, GPIO_PIN_SET);
-		HAL_Delay(100);
-		HAL_UART_Transmit(&huart1, (uint8_t*)str, 4, 0x100);
-		HAL_UART_Transmit(&huart1, (uint8_t*)"\r\n", 2, 0x100);
-	};
-	//buf[0]	= 0x00;
-	//setLastDataUSART2();
+	RS485_postTransmission();
+  uint32_t u32StartTime = Modbus_Master_Millis();
+	uint8_t TimeOUTState = 0;
+	while(xRespBtCnt != 0 && !TimeOUTState){
+	//while(!TimeOUTState){
+	//	xresult = HAL_UART_Receive(&huart2, buf2, xRespBtCnt, 0x100);
+ 	//xresult = HAL_UART_Receive(&huart2, &byte, 1, 0x100);
+		xresult = Modbus_Master_Rece_Handler();//(&xRespBtCnt);
+		if(xresult == HAL_OK){
+ 			xRespBtCnt--;
+			HAL_GPIO_WritePin(GPIOC, GPIO_PIN_9, GPIO_PIN_SET);
+			if (Modbus_Master_Rece_Available())
+			{
+				buf2[mbADUSize++] = Modbus_Master_Read();
+				//u8BytesLeft--;
+			}
+      //rbPush(&mbRxRingBuf, (uint8_t)(byte & (uint8_t)0xFFU));	
+		}
+		else if(xresult == HAL_ERROR){
+			debbugXui("ERR");
+			//HAL_Delay(100);
+		}
+		if ((Modbus_Master_Millis() - u32StartTime) > MBResponseTimeout)
+    {
+			TimeOUTState = 1;
+			debbugXui("TIM");
+      //u8MBStatus = ku8MBResponseTimedOut;//226
+    }
+	}
+	if(xRespBtCnt == 0){
+		debbugXui("KYL");
+	}
+	else debbugXui("BAD");
 }
+
+
+void debbugXui(char* receiveVal){//(uint8_t* receiveVal){
+	char str[30];		
+	sprintf(str,"%s",receiveVal);
+	//sprintf(str+2,"%x",buf2[4]);
+			//sprintf(str+3,"%x",buf2[5]);
+			//sprintf(str+4,"%x",buf2[6]);
+			//sprintf(str+6,"%x",buf2[7]);
+			//sprintf(str+7,"%x",buf2[8]);
+			//sprintf(str+9,"%x",buf2[9]);
+			//sprintf(str+10,"%x",buf2[10]);
+			//HAL_GPIO_WritePin(GPIOC, GPIO_PIN_9, GPIO_PIN_SET);
+	//HAL_Delay(1000);
+	HAL_UART_Transmit(&huart1, (uint8_t*)receiveVal, sizeof(receiveVal), 0x100);
+	HAL_UART_Transmit(&huart1, (uint8_t*)"\r\n", 2, 0x100);
+}
+/*
 static inline uint8_t lowByte(uint16_t ww)
 {
   return (uint8_t) ((ww) & 0x00FF);
@@ -145,7 +197,7 @@ static inline uint8_t lowByte(uint16_t ww)
 static inline uint8_t highByte(uint16_t ww)
 {
   return (uint8_t) ((ww) >> 8);
-}
+}*/
 void RS485_preTransmission() {
     HAL_GPIO_WritePin(MB_USART2_TXEN_GPIO_Port, MB_USART2_TXEN_Pin, GPIO_PIN_SET);
     //HAL_GPIO_WritePin(GPIOC, GPIO_PIN_9, GPIO_PIN_SET);// TODO: :??? ???????, ?????? !!!
@@ -188,6 +240,7 @@ int main(void)
   MX_USART1_UART_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
+	rbInitialize(&mbRxRingBuf, mbRxBuf, sizeof(mbRxBuf));
 	//HAL_UART_Receive(&huart1, &byte, 1, 0x100);
   //uint8_t  byt[10] = "hui";
 	//byte = "hu";
@@ -198,8 +251,9 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
+		ModbusMaster_writeSingleRegister(0x1, 0x2199,0x8D);
 		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_9, GPIO_PIN_RESET);
-		ModBusRead(0x000E, 0x1);
+		ModBusRead(0x0C1E, 4);//0x0004);
 		HAL_Delay(100);
 		/*
 		RS485_preTransmission();

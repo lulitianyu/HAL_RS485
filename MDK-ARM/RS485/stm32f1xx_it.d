@@ -24,4 +24,10 @@ rs485\stm32f1xx_it.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h
 rs485\stm32f1xx_it.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h
 rs485\stm32f1xx_it.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h
 rs485\stm32f1xx_it.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h
+rs485\stm32f1xx_it.o: ../Inc/ringbuffer.h
+rs485\stm32f1xx_it.o: ../Inc/bsp_board.h
+rs485\stm32f1xx_it.o: ../Inc/trans_recieve_buff_control.h
+rs485\stm32f1xx_it.o: ../Inc/modbus_master.h
+rs485\stm32f1xx_it.o: ../Inc/crc16.h
+rs485\stm32f1xx_it.o: ../Inc/word.h
 rs485\stm32f1xx_it.o: ../Inc/stm32f1xx_it.h
