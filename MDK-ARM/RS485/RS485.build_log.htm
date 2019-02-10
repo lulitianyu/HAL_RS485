@@ -21,22 +21,24 @@ Target DLL:      STLink\ST-LINKIII-KEIL_SWO.dll V3.0.1.0
 Dialog DLL:      TCM.DLL V1.32.0.0
  
 <h2>Project:</h2>
-C:\Users\Grigory\Documents\KEIL\DEBUG\Modbus\modbusMasterLAST\Modbus\Modbus\workspace\CubeMX_G&P_full\GP_old\MDK-ARM\RS485.uvprojx
+C:\Users\Grigory\Documents\KEIL\DEBUG\RS+MODBUS\HAL_RS485\MDK-ARM\RS485.uvprojx
 Project File Date:  02/08/2019
 
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 5 (build 528)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
 Build target 'RS485'
-compiling trans_recieve_buff_control.c...
-..\Src\trans_recieve_buff_control.c(36): warning:  #940-D: missing return statement at end of non-void function "Modbus_Master_Rece_Flush" 
-  }
-..\Src\trans_recieve_buff_control.c(106): warning:  #223-D: function "memset" declared implicitly
-  				memset(FRECbuff,0x0,100);
-..\Src\trans_recieve_buff_control.c: 2 warnings, 0 errors
+compiling main.c...
+../Inc/modbus_master.h(29): warning:  #1295-D: Deprecated declaration ModbusMaster_clearResponseBuffer - give arg types
+   void ModbusMaster_clearResponseBuffer();
+../Inc/modbus_master.h(31): warning:  #1295-D: Deprecated declaration ModbusMaster_clearTransmitBuffer - give arg types
+   void ModbusMaster_clearTransmitBuffer();
+../Src/main.c(129): warning:  #550-D: variable "buf2"  was set but never used
+  	uint8_t buf2[25]; 
+../Src/main.c: 3 warnings, 0 errors
 linking...
-Program Size: Code=6940 RO-data=344 RW-data=48 ZI-data=1952  
+Program Size: Code=5956 RO-data=344 RW-data=20 ZI-data=1692  
 FromELF: creating hex file...
-"RS485\RS485.axf" - 0 Error(s), 2 Warning(s).
+"RS485\RS485.axf" - 0 Error(s), 3 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -59,7 +61,7 @@ Package Vendor: Keil
 <h2>Collection of Component Files used:</h2>
 
    * Component: ARM::CMSIS:CORE:5.1.2
-Build Time Elapsed:  00:00:02
+Build Time Elapsed:  00:00:01
 </pre>
 </body>
 </html>

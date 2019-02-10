@@ -118,10 +118,10 @@ uint16_t CRC16(uint8_t *pucData, uint16_t usLen) {
 void ModBusRead(uint16_t adr, uint16_t len) {
 	//uint8_t buf[8]    = {	0x01, 					0x03, 		adr / 256, adr % 256, 	len / 256, len % 256,			0x00, 0x00};
 	
-	//uint8_t bufRESET[8] = {0x1, 0x06, highByte(0x2199), lowByte(0x2199), highByte(0x8D), lowByte(0x8D), 0x00, 0x00};
-	//uint16_t rez2	= CRC16(bufRESET, 6);
-	//bufRESET[6] = rez2 % 256;
-	//bufRESET[7] = rez2 / 256; 
+	//uint8_t bufFAULT[8] = {0x1, 0x03, highByte(0x1BD1), lowByte(0x1BD1), highByte(0x01), lowByte(0x01), 0x00, 0x00};
+	//uint16_t rez2	= CRC16(bufFAULT, 6);
+	//bufFAULT[6] = rez2 % 256;
+	//bufFAULT[7] = rez2 / 256; 
 	//HAL_UART_Transmit(&huart2, bufRESET, 8, 0x100);
 	//uint8_t rez2 = ("%d") len;
 	
@@ -255,6 +255,11 @@ int main(void)
 		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_9, GPIO_PIN_RESET);
 		ModBusRead(0x0C1E, 4);//0x0004);
 		HAL_Delay(100);
+		//ModBusRead(0x1BD1, 1);//0x0004);//Read LastFault Register.(if value = 5 - SLF)...
+		//TODO
+		/*
+		if(ModBusRead(0x1BD1, 1) != 0) ModbusMaster_writeSingleRegister(0x1, 0x2199,0x8D);
+		*/
 		/*
 		RS485_preTransmission();
 		HAL_UART_Transmit(&huart2, &byte, 1, 0x1000 );
